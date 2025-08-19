@@ -152,18 +152,7 @@ KubeSnoop automatically identifies common security issues:
 
 ## Architecture
 
-```
-┌─────────────────┐    ┌──────────────────┐    ┌─────────────────┐
-│   KubeSnoop     │───▶│  Kubernetes API  │───▶│   AI Analysis   │
-│   Collector     │    │     Server       │    │    Engine       │
-└─────────────────┘    └──────────────────┘    └─────────────────┘
-         │                        │                        │
-         ▼                        ▼                        ▼
-┌─────────────────┐    ┌──────────────────┐    ┌─────────────────┐
-│ Security Config │    │ Cluster Resources│    │ Recommendations │
-│   Analysis      │    │   & Metadata     │    │  & Remediation  │
-└─────────────────┘    └──────────────────┘    └─────────────────┘
-```
+TBD
 
 ## Deployment Options
 
@@ -264,7 +253,6 @@ make lint
 
 See the `examples/` directory for:
 - Sample output files
-- AI analysis prompts
 - Configuration examples
 - Integration scripts
 
@@ -272,14 +260,14 @@ See the `examples/` directory for:
 
 - [ ] Pod Security Standards analysis
 - [ ] Admission controller detection
-- [ ] Supply chain security checks
-- [ ] Integration with security scanners
+- [ ] Helm Chart
 - [ ] Prometheus metrics export
+- [ ] Grafana Dashboards
 - [ ] Web dashboard interface
 
 ## Support
 
-- 📚 [Documentation](https://github.com/kubelize/kubesnoop/wiki)
+- 📚 [Documentation](https://github.com/kubelize/kubesnoop/wiki) WIP!!!
 - 🐛 [Issues](https://github.com/kubelize/kubesnoop/issues)
 - 💬 [Discussions](https://github.com/kubelize/kubesnoop/discussions)
 - 🔒 [Security Policy](SECURITY.md)
