@@ -107,7 +107,7 @@ func createRulesCommand() *cobra.Command {
 				logrus.Fatalf("Failed to parse rule JSON: %v", err)
 			}
 
-			if err := engine.AddRule(rule); err != nil {
+			if _, err := engine.AddRule(rule); err != nil {
 				logrus.Fatalf("Failed to add rule: %v", err)
 			}
 
@@ -149,6 +149,56 @@ func createRulesCommand() *cobra.Command {
 		},
 	}
 
+	// Import rules command
+	importCmd := &cobra.Command{
+		Use:   "import <json-file>",
+		Short: "Import security rules from JSON file",
+		Long:  `Import security rules from a JSON file. Rules will be added to the database, existing rules with same names will be updated.`,
+		Args:  cobra.ExactArgs(1),
+		Run: func(cmd *cobra.Command, args []string) {
+			engine, err := rules.NewRuleEngine(rulesDbPath)
+			if err != nil {
+				logrus.Fatalf("Failed to initialize rule engine: %v", err)
+			}
+			defer engine.Close()
+
+			jsonFile := args[0]
+			if err := importRulesFromJSON(engine, jsonFile); err != nil {
+				logrus.Fatalf("Failed to import rules: %v", err)
+			}
+
+			fmt.Printf("Rules imported successfully from %s\n", jsonFile)
+		},
+	}
+
+	// Export rules command  
+	exportCmd := &cobra.Command{
+		Use:   "export [json-file]",
+		Short: "Export security rules to JSON file",
+		Long:  `Export all security rules to a JSON file. If no file specified, output to stdout.`,
+		Args:  cobra.MaximumNArgs(1),
+		Run: func(cmd *cobra.Command, args []string) {
+			engine, err := rules.NewRuleEngine(rulesDbPath)
+			if err != nil {
+				logrus.Fatalf("Failed to initialize rule engine: %v", err)
+			}
+			defer engine.Close()
+
+			var outputFile string
+			if len(args) > 0 {
+				outputFile = args[0]
+			}
+
+			if err := exportRulesToJSON(engine, outputFile); err != nil {
+				logrus.Fatalf("Failed to export rules: %v", err)
+			}
+
+			if outputFile != "" {
+				fmt.Printf("Rules exported successfully to %s\n", outputFile)
+			}
+		},
+	}
+
 	// Delete rule command
 	deleteCmd := &cobra.Command{
 		Use:   "delete <id>",
@@ -174,7 +224,7 @@ func createRulesCommand() *cobra.Command {
 		},
 	}
 
-	rulesCmd.AddCommand(listCmd, showCmd, addCmd, toggleCmd, deleteCmd)
+	rulesCmd.AddCommand(listCmd, showCmd, addCmd, toggleCmd, deleteCmd, importCmd, exportCmd)
 	return rulesCmd
 }
 
@@ -207,4 +257,80 @@ func printRuleDetails(rule rules.SecurityRule) {
 	fmt.Printf("Query: %s\n", rule.Query)
 	fmt.Printf("Condition: %s\n", rule.Condition)
 	fmt.Printf("Tags: %s\n", rule.Tags)
+}
+
+func importRulesFromJSON(engine *rules.RuleEngine, jsonFile string) error {
+	// Read JSON file
+	data, err := os.ReadFile(jsonFile)
+	if err != nil {
+		return fmt.Errorf("failed to read file %s: %v", jsonFile, err)
+	}
+
+	// Parse JSON
+	var importRules []rules.SecurityRule
+	if err := json.Unmarshal(data, &importRules); err != nil {
+		return fmt.Errorf("failed to parse JSON: %v", err)
+	}
+
+	// Import rules
+	imported := 0
+	updated := 0
+	for _, rule := range importRules {
+		// Check if rule with same name exists
+		existingRules, err := engine.GetRules("")
+		if err != nil {
+			return fmt.Errorf("failed to check existing rules: %v", err)
+		}
+
+		var existingRule *rules.SecurityRule
+		for _, existing := range existingRules {
+			if existing.Name == rule.Name {
+				existingRule = &existing
+				break
+			}
+		}
+
+		if existingRule != nil {
+			// Update existing rule
+			rule.ID = existingRule.ID
+			if err := engine.UpdateRule(rule); err != nil {
+				return fmt.Errorf("failed to update rule '%s': %v", rule.Name, err)
+			}
+			updated++
+		} else {
+			// Add new rule
+			if _, err := engine.AddRule(rule); err != nil {
+				return fmt.Errorf("failed to add rule '%s': %v", rule.Name, err)
+			}
+			imported++
+		}
+	}
+
+	fmt.Printf("Import summary: %d new rules added, %d existing rules updated\n", imported, updated)
+	return nil
+}
+
+func exportRulesToJSON(engine *rules.RuleEngine, outputFile string) error {
+	// Get all rules
+	rulesList, err := engine.GetRules("")
+	if err != nil {
+		return fmt.Errorf("failed to get rules: %v", err)
+	}
+
+	// Convert to JSON
+	jsonData, err := json.MarshalIndent(rulesList, "", "    ")
+	if err != nil {
+		return fmt.Errorf("failed to marshal rules to JSON: %v", err)
+	}
+
+	// Output to file or stdout
+	if outputFile != "" {
+		if err := os.WriteFile(outputFile, jsonData, 0644); err != nil {
+			return fmt.Errorf("failed to write file %s: %v", outputFile, err)
+		}
+	} else {
+		fmt.Println(string(jsonData))
+	}
+
+	return nil
 }

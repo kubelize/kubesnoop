@@ -44,6 +44,9 @@ git clone https://github.com/kubelize/kubesnoop.git
 cd kubesnoop
 make build
 
+# Import default security rules
+./bin/kubesnoop rules import examples/default-rules.json
+
 # Run against local cluster
 ./scripts/run-local.sh
 ```
@@ -93,6 +96,15 @@ kubectl logs -n kubesnoop -l app=kubesnoop
 
 # Delete a rule
 ./bin/kubesnoop rules delete 5
+
+# Import rules from JSON file
+./bin/kubesnoop rules import examples/default-rules.json
+
+# Export rules to JSON file
+./bin/kubesnoop rules export my-rules.json
+
+# Clear all rules (reset database)
+rm kubesnoop.db
 ```
 
 ### Configuration
