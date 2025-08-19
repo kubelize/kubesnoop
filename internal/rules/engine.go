@@ -2,7 +2,6 @@ package rules
 
 import (
 	"database/sql"
-	"fmt"
 
 	_ "modernc.org/sqlite"
 )
@@ -75,157 +74,24 @@ func (re *RuleEngine) initDatabase() error {
 	`
 
 	_, err := re.db.Exec(schema)
-	if err != nil {
-		return err
-	}
-
-	// Insert default rules if table is empty
-	var count int
-	err = re.db.QueryRow("SELECT COUNT(*) FROM security_rules").Scan(&count)
-	if err != nil {
-		return err
-	}
-
-	if count == 0 {
-		return re.loadDefaultRules()
-	}
-
-	return nil
+	return err
 }
 
-func (re *RuleEngine) loadDefaultRules() error {
-	defaultRules := []SecurityRule{
-		{
-			Name:        "privileged-container",
-			Category:    "Container Security",
-			Severity:    "HIGH",
-			Description: "Container is running in privileged mode",
-			Remediation: "Remove privileged: true from container security context",
-			RuleType:    "pod",
-			Query:       "$.containers[*].securityContext.privileged",
-			Condition:   "== true",
-			Enabled:     true,
-			Tags:        "cis,nist,privileged",
-		},
-		{
-			Name:        "root-user-container",
-			Category:    "Container Security", 
-			Severity:    "MEDIUM",
-			Description: "Container may be running as root user",
-			Remediation: "Set runAsNonRoot: true and runAsUser to non-zero value",
-			RuleType:    "pod",
-			Query:       "$.containers[*].securityContext.runAsUser",
-			Condition:   "== 0 OR null",
-			Enabled:     true,
-			Tags:        "cis,root,user",
-		},
-		{
-			Name:        "no-resource-limits",
-			Category:    "Resource Management",
-			Severity:    "MEDIUM", 
-			Description: "Container has no resource limits defined",
-			Remediation: "Set CPU and memory limits to prevent resource exhaustion",
-			RuleType:    "pod",
-			Query:       "$.containers[*].resources.limits",
-			Condition:   "null OR empty",
-			Enabled:     true,
-			Tags:        "resources,limits",
-		},
-		{
-			Name:        "latest-image-tag",
-			Category:    "Image Security",
-			Severity:    "LOW",
-			Description: "Container uses 'latest' tag or no tag specified",
-			Remediation: "Use specific image tags for reproducible deployments",
-			RuleType:    "pod",
-			Query:       "$.containers[*].image",
-			Condition:   "endsWith ':latest' OR NOT contains ':'",
-			Enabled:     true,
-			Tags:        "image,tags,reproducibility",
-		},
-		{
-			Name:        "host-network-usage",
-			Category:    "Host Security",
-			Severity:    "HIGH",
-			Description: "Pod uses host network namespace",
-			Remediation: "Avoid hostNetwork unless absolutely necessary",
-			RuleType:    "pod",
-			Query:       "$.hostNetwork",
-			Condition:   "== true",
-			Enabled:     true,
-			Tags:        "host,network,isolation",
-		},
-		{
-			Name:        "nodeport-service",
-			Category:    "Network Security",
-			Severity:    "MEDIUM",
-			Description: "Service uses NodePort type which exposes ports on all nodes",
-			Remediation: "Consider using ClusterIP or LoadBalancer instead",
-			RuleType:    "service",
-			Query:       "$.type",
-			Condition:   "== 'NodePort'",
-			Enabled:     true,
-			Tags:        "network,exposure",
-		},
-		{
-			Name:        "wildcard-rbac-permissions",
-			Category:    "RBAC",
-			Severity:    "HIGH",
-			Description: "Role has wildcard permissions (*/*)",
-			Remediation: "Use least-privilege principle and specify exact resources and verbs",
-			RuleType:    "rbac",
-			Query:       "$.rules[*].resources[*]",
-			Condition:   "== '*'",
-			Enabled:     true,
-			Tags:        "rbac,wildcard,permissions",
-		},
-		{
-			Name:        "default-service-account",
-			Category:    "RBAC",
-			Severity:    "LOW",
-			Description: "Pod uses default service account",
-			Remediation: "Create and use dedicated service accounts for applications",
-			RuleType:    "pod",
-			Query:       "$.serviceAccount",
-			Condition:   "== 'default' OR == '' OR null",
-			Enabled:     true,
-			Tags:        "rbac,service-account",
-		},
-		{
-			Name:        "no-network-policies",
-			Category:    "Network Security",
-			Severity:    "MEDIUM",
-			Description: "Namespace has no network policies - all traffic allowed by default",
-			Remediation: "Implement network policies to restrict pod-to-pod communication",
-			RuleType:    "namespace",
-			Query:       "$.networkPolicies",
-			Condition:   "count == 0",
-			Enabled:     true,
-			Tags:        "network,policies,segmentation",
-		},
-	}
-
-	for _, rule := range defaultRules {
-		err := re.AddRule(rule)
-		if err != nil {
-			return fmt.Errorf("failed to add default rule %s: %v", rule.Name, err)
-		}
-	}
-
-	return nil
-}
-
-func (re *RuleEngine) AddRule(rule SecurityRule) error {
+func (re *RuleEngine) AddRule(rule SecurityRule) (int64, error) {
 	query := `
 	INSERT INTO security_rules 
 	(name, category, severity, description, remediation, rule_type, query, condition, enabled, tags)
 	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
 	`
-	_, err := re.db.Exec(query, rule.Name, rule.Category, rule.Severity, 
+	result, err := re.db.Exec(query, rule.Name, rule.Category, rule.Severity, 
 		rule.Description, rule.Remediation, rule.RuleType, rule.Query, 
 		rule.Condition, rule.Enabled, rule.Tags)
 	
-	return err
+	if err != nil {
+		return 0, err
+	}
+	
+	return result.LastInsertId()
 }
 
 func (re *RuleEngine) GetRules(ruleType string) ([]SecurityRule, error) {
@@ -258,7 +124,7 @@ func (re *RuleEngine) GetRules(ruleType string) ([]SecurityRule, error) {
 	return rules, nil
 }
 
-func (re *RuleEngine) UpdateRule(id int, rule SecurityRule) error {
+func (re *RuleEngine) UpdateRuleByID(id int, rule SecurityRule) error {
 	query := `
 	UPDATE security_rules 
 	SET name=?, category=?, severity=?, description=?, remediation=?, 
@@ -270,6 +136,10 @@ func (re *RuleEngine) UpdateRule(id int, rule SecurityRule) error {
 		rule.Condition, rule.Enabled, rule.Tags, id)
 	
 	return err
+}
+
+func (re *RuleEngine) UpdateRule(rule SecurityRule) error {
+	return re.UpdateRuleByID(rule.ID, rule)
 }
 
 func (re *RuleEngine) DeleteRule(id int) error {
