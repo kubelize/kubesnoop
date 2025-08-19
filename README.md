@@ -1,10 +1,10 @@
 # KubeSnoop
 
-A Kubernetes cluster security information collection and evalutaion tool.
+A Kubernetes cluster security information collection and evaluation tool.
 
 ## Overview
 
-KubeSnoop systematically collects comprehensive security-relevant information from Kubernetes clusters. It focuses on identifying misconfigurations, security vulnerabilities, and compliance gaps across your cluster infrastructure.
+KubeSnoop systematically collects security-relevant information from Kubernetes clusters. The focus is on identifying misconfigurations, security vulnerabilities, and compliance gaps across your cluster.
 
 ## Features
 
