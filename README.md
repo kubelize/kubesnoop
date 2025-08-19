@@ -124,11 +124,7 @@ modules:
 
 ## AI Integration
 
-KubeSnoop output is designed to work seamlessly with AI analysis:### Sample Analysis Workflow
-1. **Collect Data**: `kubesnoop --format json --output cluster.json`
-2. **AI Analysis**: Use provided prompt templates with GPT-4/Claude
-3. **Review Results**: Validate AI recommendations
-4. **Implement Fixes**: Apply suggested security improvements
+WIP
 
 ### Example AI Prompt
 ```
