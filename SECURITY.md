@@ -14,7 +14,7 @@ KubeSnoop follows semantic versioning. Security updates are provided for:
 If you discover a security vulnerability in KubeSnoop, please report it responsibly:
 
 1. **DO NOT** create a public issue
-2. Email security findings to: security@kubelize.com
+2. Email security findings to: kubelize@kubelize.com
 3. Include:
    - Description of the vulnerability
    - Steps to reproduce
