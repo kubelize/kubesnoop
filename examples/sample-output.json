@@ -1,0 +1,206 @@
+{
+  "collection_time": "2025-08-19T21:30:00Z",
+  "cluster_version": "1.28",
+  "nodes": [
+    {
+      "name": "worker-node-1",
+      "version": "v1.28.2",
+      "os": "linux",
+      "kernel": "5.15.0-72-generic",
+      "container_runtime": "containerd://1.6.20",
+      "labels": {
+        "kubernetes.io/arch": "amd64",
+        "kubernetes.io/os": "linux",
+        "node-role.kubernetes.io/worker": ""
+      },
+      "taints": [],
+      "conditions": [
+        {
+          "type": "Ready",
+          "status": "True",
+          "reason": "KubeletReady"
+        }
+      ]
+    }
+  ],
+  "namespaces": [
+    {
+      "name": "default",
+      "labels": {},
+      "annotations": {},
+      "phase": "Active"
+    },
+    {
+      "name": "production",
+      "labels": {
+        "environment": "prod"
+      },
+      "annotations": {},
+      "phase": "Active"
+    }
+  ],
+  "pods": [
+    {
+      "name": "webapp-deployment-7d8f9b6c5d-xr8k2",
+      "namespace": "production",
+      "labels": {
+        "app": "webapp",
+        "version": "v1.0.0"
+      },
+      "annotations": {},
+      "service_account": "default",
+      "security_context": {
+        "runAsUser": 0,
+        "runAsNonRoot": false
+      },
+      "containers": [
+        {
+          "name": "webapp",
+          "image": "nginx:latest",
+          "security_context": {
+            "privileged": false,
+            "runAsUser": 0,
+            "runAsNonRoot": false,
+            "readOnlyRootFilesystem": false
+          },
+          "resources": {},
+          "ports": [
+            {
+              "containerPort": 80,
+              "protocol": "TCP"
+            }
+          ]
+        }
+      ],
+      "owner": "ReplicaSet/webapp-deployment-7d8f9b6c5d",
+      "phase": "Running",
+      "host_network": false,
+      "host_pid": false,
+      "host_ipc": false
+    }
+  ],
+  "services": [
+    {
+      "name": "webapp-service",
+      "namespace": "production",
+      "type": "NodePort",
+      "ports": [
+        {
+          "port": 80,
+          "targetPort": {
+            "IntVal": 80
+          },
+          "nodePort": 30080,
+          "protocol": "TCP"
+        }
+      ],
+      "selector": {
+        "app": "webapp"
+      },
+      "external_ips": []
+    }
+  ],
+  "network_policies": [],
+  "rbac": {
+    "cluster_roles": [
+      {
+        "metadata": {
+          "name": "admin-role"
+        },
+        "rules": [
+          {
+            "verbs": ["*"],
+            "resources": ["*"],
+            "apiGroups": ["*"]
+          }
+        ]
+      }
+    ],
+    "cluster_role_bindings": [
+      {
+        "metadata": {
+          "name": "admin-binding"
+        },
+        "subjects": [
+          {
+            "kind": "User",
+            "name": "admin@company.com"
+          }
+        ],
+        "roleRef": {
+          "kind": "ClusterRole",
+          "name": "admin-role",
+          "apiGroup": "rbac.authorization.k8s.io"
+        }
+      }
+    ],
+    "roles": [],
+    "role_bindings": [],
+    "service_accounts": [
+      {
+        "metadata": {
+          "name": "default",
+          "namespace": "production"
+        }
+      }
+    ]
+  },
+  "security_findings": [
+    {
+      "severity": "HIGH",
+      "category": "RBAC",
+      "resource": "ClusterRole/admin-role",
+      "message": "ClusterRole has wildcard permissions (*/*)",
+      "remediation": "Use least-privilege principle and specify exact resources and verbs"
+    },
+    {
+      "severity": "MEDIUM",
+      "category": "Container Security",
+      "resource": "Pod/production/webapp-deployment-7d8f9b6c5d-xr8k2",
+      "message": "Container 'webapp' may be running as root",
+      "remediation": "Set runAsNonRoot: true and runAsUser to non-zero value"
+    },
+    {
+      "severity": "MEDIUM",
+      "category": "Resource Management",
+      "resource": "Pod/production/webapp-deployment-7d8f9b6c5d-xr8k2",
+      "message": "Container 'webapp' has no resource limits",
+      "remediation": "Set CPU and memory limits to prevent resource exhaustion"
+    },
+    {
+      "severity": "LOW",
+      "category": "Image Security",
+      "resource": "Pod/production/webapp-deployment-7d8f9b6c5d-xr8k2",
+      "message": "Container 'webapp' uses 'latest' tag or no tag",
+      "remediation": "Use specific image tags for reproducible deployments"
+    },
+    {
+      "severity": "MEDIUM",
+      "category": "Network Security",
+      "resource": "Service/production/webapp-service",
+      "message": "Service uses NodePort type which exposes ports on all nodes",
+      "remediation": "Consider using ClusterIP or LoadBalancer instead"
+    },
+    {
+      "severity": "LOW",
+      "category": "RBAC",
+      "resource": "Pod/production/webapp-deployment-7d8f9b6c5d-xr8k2",
+      "message": "Pod uses default service account",
+      "remediation": "Create and use dedicated service accounts for applications"
+    },
+    {
+      "severity": "MEDIUM",
+      "category": "Network Security",
+      "resource": "Namespace/production",
+      "message": "Namespace has no network policies - all traffic is allowed by default",
+      "remediation": "Implement network policies to restrict pod-to-pod communication"
+    }
+  ],
+  "summary": {
+    "total_nodes": 1,
+    "total_namespaces": 2,
+    "total_pods": 1,
+    "total_services": 1,
+    "security_findings": 7
+  }
+}

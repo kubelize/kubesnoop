@@ -1,0 +1,32 @@
+# KubeSnoop Example Configuration
+
+# Security-focused settings
+security_focus: true
+detailed_analysis: true
+redact_sensitive: true
+include_secrets: false
+
+# Namespaces to exclude from collection
+exclude_namespaces:
+  - "kube-system"
+  - "kube-public"
+  - "kube-node-lease"
+  - "local-path-storage"
+  - "docker"
+  - "metallb-system"
+
+# Output settings
+compression_enabled: false
+
+# Collection modules - enable/disable specific collectors
+modules:
+  pods: true
+  services: true
+  network_policies: true
+  rbac: true
+  secrets: false  # Disabled for security - enable only if needed
+  configmaps: true
+  nodes: true
+  namespaces: true
+  events: true
+  pod_security_standards: true

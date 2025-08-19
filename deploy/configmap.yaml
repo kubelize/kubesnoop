@@ -1,0 +1,31 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: kubesnoop-config
+  namespace: kubesnoop
+data:
+  kubesnoop.yaml: |
+    # Security-focused collection settings
+    security_focus: true
+    detailed_analysis: true
+    redact_sensitive: true
+    
+    # Exclude system namespaces by default
+    exclude_namespaces:
+      - "kube-system"
+      - "kube-public"
+      - "kube-node-lease"
+      - "local-path-storage"
+    
+    # Collection modules
+    modules:
+      pods: true
+      services: true
+      network_policies: true
+      rbac: true
+      secrets: false  # Disabled for security
+      configmaps: true
+      nodes: true
+      namespaces: true
+      events: true
+      pod_security_standards: true

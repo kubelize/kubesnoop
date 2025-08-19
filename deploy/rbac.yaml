@@ -1,0 +1,94 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: kubesnoop
+  labels:
+    name: kubesnoop
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: kubesnoop
+  namespace: kubesnoop
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: kubesnoop
+rules:
+# Core resources
+- apiGroups: [""]
+  resources:
+  - nodes
+  - namespaces
+  - pods
+  - services
+  - configmaps
+  - secrets
+  - serviceaccounts
+  - events
+  verbs: ["get", "list"]
+
+# Apps resources  
+- apiGroups: ["apps"]
+  resources:
+  - deployments
+  - replicasets
+  - daemonsets
+  - statefulsets
+  verbs: ["get", "list"]
+
+# RBAC resources
+- apiGroups: ["rbac.authorization.k8s.io"]
+  resources:
+  - roles
+  - rolebindings
+  - clusterroles
+  - clusterrolebindings
+  verbs: ["get", "list"]
+
+# Network policies
+- apiGroups: ["networking.k8s.io"]
+  resources:
+  - networkpolicies
+  verbs: ["get", "list"]
+
+# Extensions (for backwards compatibility)
+- apiGroups: ["extensions"]
+  resources:
+  - networkpolicies
+  verbs: ["get", "list"]
+
+# Policy resources
+- apiGroups: ["policy"]
+  resources:
+  - podsecuritypolicies
+  - poddisruptionbudgets
+  verbs: ["get", "list"]
+
+# Storage resources
+- apiGroups: ["storage.k8s.io"]
+  resources:
+  - storageclasses
+  - volumeattachments
+  verbs: ["get", "list"]
+
+# API discovery
+- apiGroups: [""]
+  resources:
+  - ""
+  verbs: ["get"]
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: kubesnoop
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: kubesnoop
+subjects:
+- kind: ServiceAccount
+  name: kubesnoop
+  namespace: kubesnoop

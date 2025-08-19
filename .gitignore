@@ -1,0 +1,29 @@
+# Binaries
+bin/
+
+# OS files
+.DS_Store
+
+# Output files
+kubesnoop-output.json
+kubesnoop-output.yaml
+*.log
+
+# Docker
+.dockerignore
+
+# Database files
+kubesnoop.db
+*.db
+*.sqlite
+*.sqlite3
+
+# Kubernetes secrets (if any)
+secrets/
+*.key
+*.crt
+*.pem
+
+# Temporary files
+tmp/
+temp/

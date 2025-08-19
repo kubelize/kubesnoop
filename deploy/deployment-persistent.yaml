@@ -1,0 +1,85 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kubesnoop-persistent
+  namespace: kubesnoop
+  labels:
+    app: kubesnoop
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: kubesnoop
+  template:
+    metadata:
+      labels:
+        app: kubesnoop
+    spec:
+      serviceAccountName: kubesnoop
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 65534
+        fsGroup: 65534
+      containers:
+      - name: kubesnoop
+        image: kubesnoop:latest
+        imagePullPolicy: IfNotPresent
+        command:
+        - /app/kubesnoop
+        args:
+        - --daemon
+        - --interval=1h
+        - --format=json
+        env:
+        - name: KUBESNOOP_SECURITY_FOCUS
+          value: "true"
+        - name: KUBESNOOP_DETAILED_ANALYSIS
+          value: "true"
+        - name: KUBESNOOP_DB_PATH
+          value: "/app/data/kubesnoop.db"
+        resources:
+          requests:
+            cpu: 100m
+            memory: 128Mi
+          limits:
+            cpu: 500m
+            memory: 512Mi
+        securityContext:
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: true
+          runAsNonRoot: true
+          capabilities:
+            drop:
+            - ALL
+        volumeMounts:
+        - name: config
+          mountPath: /etc/kubesnoop
+          readOnly: true
+        - name: data
+          mountPath: /app/data
+        - name: tmp
+          mountPath: /tmp
+      volumes:
+      - name: config
+        configMap:
+          name: kubesnoop-config
+      - name: data
+        persistentVolumeClaim:
+          claimName: kubesnoop-data
+      - name: tmp
+        emptyDir: {}
+      restartPolicy: Always
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: kubesnoop-data
+  namespace: kubesnoop
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+  # Uncomment and modify for specific storage class
+  # storageClassName: fast-ssd
