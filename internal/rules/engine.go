@@ -37,7 +37,7 @@ type RuleResult struct {
 }
 
 func NewRuleEngine(dbPath string) (*RuleEngine, error) {
-	db, err := sql.Open("sqlite3", dbPath)
+	db, err := sql.Open("sqlite", dbPath)
 	if err != nil {
 		return nil, err
 	}
