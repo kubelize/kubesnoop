@@ -4,9 +4,9 @@ import (
 	"context"
 
 	"github.com/sirupsen/logrus"
+	corev1 "k8s.io/api/core/v1"
 	networkingv1 "k8s.io/api/networking/v1"
 	rbacv1 "k8s.io/api/rbac/v1"
-	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
@@ -70,7 +70,7 @@ func (c *Collector) collectRBAC(ctx context.Context, targetNamespace string) (*R
 	} else {
 		roles, err = c.clientset.RbacV1().Roles("").List(ctx, metav1.ListOptions{})
 	}
-	
+
 	if err != nil {
 		logrus.Errorf("Failed to collect roles: %v", err)
 	} else {
@@ -88,7 +88,7 @@ func (c *Collector) collectRBAC(ctx context.Context, targetNamespace string) (*R
 	} else {
 		roleBindings, err = c.clientset.RbacV1().RoleBindings("").List(ctx, metav1.ListOptions{})
 	}
-	
+
 	if err != nil {
 		logrus.Errorf("Failed to collect role bindings: %v", err)
 	} else {
@@ -106,7 +106,7 @@ func (c *Collector) collectRBAC(ctx context.Context, targetNamespace string) (*R
 	} else {
 		serviceAccounts, err = c.clientset.CoreV1().ServiceAccounts("").List(ctx, metav1.ListOptions{})
 	}
-	
+
 	if err != nil {
 		logrus.Errorf("Failed to collect service accounts: %v", err)
 	} else {
@@ -118,7 +118,7 @@ func (c *Collector) collectRBAC(ctx context.Context, targetNamespace string) (*R
 	}
 
 	logrus.Debugf("Collected RBAC: %d cluster roles, %d cluster role bindings, %d roles, %d role bindings, %d service accounts",
-		len(rbacInfo.ClusterRoles), len(rbacInfo.ClusterRoleBindings), len(rbacInfo.Roles), 
+		len(rbacInfo.ClusterRoles), len(rbacInfo.ClusterRoleBindings), len(rbacInfo.Roles),
 		len(rbacInfo.RoleBindings), len(rbacInfo.ServiceAccounts))
 
 	return rbacInfo, nil

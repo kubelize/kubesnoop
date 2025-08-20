@@ -171,7 +171,7 @@ func createRulesCommand() *cobra.Command {
 		},
 	}
 
-	// Export rules command  
+	// Export rules command
 	exportCmd := &cobra.Command{
 		Use:   "export [json-file]",
 		Short: "Export security rules to JSON file",
@@ -232,16 +232,16 @@ func printRulesTable(rulesList []rules.SecurityRule) {
 	w := tabwriter.NewWriter(os.Stdout, 0, 0, 2, ' ', 0)
 	fmt.Fprintln(w, "ID\tNAME\tTYPE\tCATEGORY\tSEVERITY\tENABLED")
 	fmt.Fprintln(w, "--\t----\t----\t--------\t--------\t-------")
-	
+
 	for _, rule := range rulesList {
 		enabled := "No"
 		if rule.Enabled {
 			enabled = "Yes"
 		}
-		fmt.Fprintf(w, "%d\t%s\t%s\t%s\t%s\t%s\n", 
+		fmt.Fprintf(w, "%d\t%s\t%s\t%s\t%s\t%s\n",
 			rule.ID, rule.Name, rule.RuleType, rule.Category, rule.Severity, enabled)
 	}
-	
+
 	w.Flush()
 }
 

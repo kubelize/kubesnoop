@@ -19,11 +19,11 @@ type SecurityRule struct {
 	Severity    string `json:"severity"`
 	Description string `json:"description"`
 	Remediation string `json:"remediation"`
-	RuleType    string `json:"rule_type"`    // pod, service, rbac, node, etc.
-	Query       string `json:"query"`       // JSONPath or SQL-like query
-	Condition   string `json:"condition"`   // evaluation condition
+	RuleType    string `json:"rule_type"` // pod, service, rbac, node, etc.
+	Query       string `json:"query"`     // JSONPath or SQL-like query
+	Condition   string `json:"condition"` // evaluation condition
 	Enabled     bool   `json:"enabled"`
-	Tags        string `json:"tags"`        // comma-separated tags
+	Tags        string `json:"tags"` // comma-separated tags
 }
 
 // RuleResult represents the result of a rule evaluation
@@ -83,21 +83,21 @@ func (re *RuleEngine) AddRule(rule SecurityRule) (int64, error) {
 	(name, category, severity, description, remediation, rule_type, query, condition, enabled, tags)
 	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
 	`
-	result, err := re.db.Exec(query, rule.Name, rule.Category, rule.Severity, 
-		rule.Description, rule.Remediation, rule.RuleType, rule.Query, 
+	result, err := re.db.Exec(query, rule.Name, rule.Category, rule.Severity,
+		rule.Description, rule.Remediation, rule.RuleType, rule.Query,
 		rule.Condition, rule.Enabled, rule.Tags)
-	
+
 	if err != nil {
 		return 0, err
 	}
-	
+
 	return result.LastInsertId()
 }
 
 func (re *RuleEngine) GetRules(ruleType string) ([]SecurityRule, error) {
 	query := "SELECT id, name, category, severity, description, remediation, rule_type, query, condition, enabled, tags FROM security_rules WHERE enabled = true"
 	args := []interface{}{}
-	
+
 	if ruleType != "" {
 		query += " AND rule_type = ?"
 		args = append(args, ruleType)
@@ -134,7 +134,7 @@ func (re *RuleEngine) UpdateRuleByID(id int, rule SecurityRule) error {
 	_, err := re.db.Exec(query, rule.Name, rule.Category, rule.Severity,
 		rule.Description, rule.Remediation, rule.RuleType, rule.Query,
 		rule.Condition, rule.Enabled, rule.Tags, id)
-	
+
 	return err
 }
 
