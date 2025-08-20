@@ -21,72 +21,72 @@ type Collector struct {
 }
 
 type ClusterInfo struct {
-	CollectionTime   time.Time         `json:"collection_time" yaml:"collection_time"`
-	ClusterVersion   string           `json:"cluster_version" yaml:"cluster_version"`
-	Nodes            []NodeInfo       `json:"nodes,omitempty" yaml:"nodes,omitempty"`
-	Namespaces       []NamespaceInfo  `json:"namespaces,omitempty" yaml:"namespaces,omitempty"`
-	Pods             []PodInfo        `json:"pods,omitempty" yaml:"pods,omitempty"`
-	Services         []ServiceInfo    `json:"services,omitempty" yaml:"services,omitempty"`
+	CollectionTime   time.Time           `json:"collection_time" yaml:"collection_time"`
+	ClusterVersion   string              `json:"cluster_version" yaml:"cluster_version"`
+	Nodes            []NodeInfo          `json:"nodes,omitempty" yaml:"nodes,omitempty"`
+	Namespaces       []NamespaceInfo     `json:"namespaces,omitempty" yaml:"namespaces,omitempty"`
+	Pods             []PodInfo           `json:"pods,omitempty" yaml:"pods,omitempty"`
+	Services         []ServiceInfo       `json:"services,omitempty" yaml:"services,omitempty"`
 	NetworkPolicies  []NetworkPolicyInfo `json:"network_policies,omitempty" yaml:"network_policies,omitempty"`
-	RBAC             RBACInfo         `json:"rbac,omitempty" yaml:"rbac,omitempty"`
-	SecurityFindings []SecurityFinding `json:"security_findings,omitempty" yaml:"security_findings,omitempty"`
-	Summary          ClusterSummary   `json:"summary" yaml:"summary"`
+	RBAC             RBACInfo            `json:"rbac,omitempty" yaml:"rbac,omitempty"`
+	SecurityFindings []SecurityFinding   `json:"security_findings,omitempty" yaml:"security_findings,omitempty"`
+	Summary          ClusterSummary      `json:"summary" yaml:"summary"`
 }
 
 type NodeInfo struct {
-	Name        string            `json:"name" yaml:"name"`
-	Version     string            `json:"version" yaml:"version"`
-	OS          string            `json:"os" yaml:"os"`
-	Kernel      string            `json:"kernel" yaml:"kernel"`
-	Container   string            `json:"container_runtime" yaml:"container_runtime"`
-	Labels      map[string]string `json:"labels,omitempty" yaml:"labels,omitempty"`
-	Taints      []corev1.Taint    `json:"taints,omitempty" yaml:"taints,omitempty"`
-	Conditions  []corev1.NodeCondition `json:"conditions,omitempty" yaml:"conditions,omitempty"`
+	Name       string                 `json:"name" yaml:"name"`
+	Version    string                 `json:"version" yaml:"version"`
+	OS         string                 `json:"os" yaml:"os"`
+	Kernel     string                 `json:"kernel" yaml:"kernel"`
+	Container  string                 `json:"container_runtime" yaml:"container_runtime"`
+	Labels     map[string]string      `json:"labels,omitempty" yaml:"labels,omitempty"`
+	Taints     []corev1.Taint         `json:"taints,omitempty" yaml:"taints,omitempty"`
+	Conditions []corev1.NodeCondition `json:"conditions,omitempty" yaml:"conditions,omitempty"`
 }
 
 type NamespaceInfo struct {
-	Name        string            `json:"name" yaml:"name"`
-	Labels      map[string]string `json:"labels,omitempty" yaml:"labels,omitempty"`
-	Annotations map[string]string `json:"annotations,omitempty" yaml:"annotations,omitempty"`
+	Name        string                `json:"name" yaml:"name"`
+	Labels      map[string]string     `json:"labels,omitempty" yaml:"labels,omitempty"`
+	Annotations map[string]string     `json:"annotations,omitempty" yaml:"annotations,omitempty"`
 	Phase       corev1.NamespacePhase `json:"phase" yaml:"phase"`
 }
 
 type PodInfo struct {
-	Name              string                      `json:"name" yaml:"name"`
-	Namespace         string                      `json:"namespace" yaml:"namespace"`
-	Labels            map[string]string           `json:"labels,omitempty" yaml:"labels,omitempty"`
-	Annotations       map[string]string           `json:"annotations,omitempty" yaml:"annotations,omitempty"`
-	ServiceAccount    string                      `json:"service_account" yaml:"service_account"`
-	SecurityContext   *corev1.PodSecurityContext  `json:"security_context,omitempty" yaml:"security_context,omitempty"`
-	Containers        []ContainerInfo             `json:"containers" yaml:"containers"`
-	Owner             string                      `json:"owner,omitempty" yaml:"owner,omitempty"`
-	Phase             corev1.PodPhase             `json:"phase" yaml:"phase"`
-	HostNetwork       bool                        `json:"host_network" yaml:"host_network"`
-	HostPID           bool                        `json:"host_pid" yaml:"host_pid"`
-	HostIPC           bool                        `json:"host_ipc" yaml:"host_ipc"`
+	Name            string                     `json:"name" yaml:"name"`
+	Namespace       string                     `json:"namespace" yaml:"namespace"`
+	Labels          map[string]string          `json:"labels,omitempty" yaml:"labels,omitempty"`
+	Annotations     map[string]string          `json:"annotations,omitempty" yaml:"annotations,omitempty"`
+	ServiceAccount  string                     `json:"service_account" yaml:"service_account"`
+	SecurityContext *corev1.PodSecurityContext `json:"security_context,omitempty" yaml:"security_context,omitempty"`
+	Containers      []ContainerInfo            `json:"containers" yaml:"containers"`
+	Owner           string                     `json:"owner,omitempty" yaml:"owner,omitempty"`
+	Phase           corev1.PodPhase            `json:"phase" yaml:"phase"`
+	HostNetwork     bool                       `json:"host_network" yaml:"host_network"`
+	HostPID         bool                       `json:"host_pid" yaml:"host_pid"`
+	HostIPC         bool                       `json:"host_ipc" yaml:"host_ipc"`
 }
 
 type ContainerInfo struct {
-	Name            string                        `json:"name" yaml:"name"`
-	Image           string                        `json:"image" yaml:"image"`
-	SecurityContext *corev1.SecurityContext       `json:"security_context,omitempty" yaml:"security_context,omitempty"`
-	Resources       corev1.ResourceRequirements   `json:"resources,omitempty" yaml:"resources,omitempty"`
-	Ports           []corev1.ContainerPort        `json:"ports,omitempty" yaml:"ports,omitempty"`
+	Name            string                      `json:"name" yaml:"name"`
+	Image           string                      `json:"image" yaml:"image"`
+	SecurityContext *corev1.SecurityContext     `json:"security_context,omitempty" yaml:"security_context,omitempty"`
+	Resources       corev1.ResourceRequirements `json:"resources,omitempty" yaml:"resources,omitempty"`
+	Ports           []corev1.ContainerPort      `json:"ports,omitempty" yaml:"ports,omitempty"`
 }
 
 type ServiceInfo struct {
-	Name        string                 `json:"name" yaml:"name"`
-	Namespace   string                 `json:"namespace" yaml:"namespace"`
-	Type        corev1.ServiceType     `json:"type" yaml:"type"`
-	Ports       []corev1.ServicePort   `json:"ports,omitempty" yaml:"ports,omitempty"`
-	Selector    map[string]string      `json:"selector,omitempty" yaml:"selector,omitempty"`
-	ExternalIPs []string               `json:"external_ips,omitempty" yaml:"external_ips,omitempty"`
+	Name        string               `json:"name" yaml:"name"`
+	Namespace   string               `json:"namespace" yaml:"namespace"`
+	Type        corev1.ServiceType   `json:"type" yaml:"type"`
+	Ports       []corev1.ServicePort `json:"ports,omitempty" yaml:"ports,omitempty"`
+	Selector    map[string]string    `json:"selector,omitempty" yaml:"selector,omitempty"`
+	ExternalIPs []string             `json:"external_ips,omitempty" yaml:"external_ips,omitempty"`
 }
 
 type NetworkPolicyInfo struct {
-	Name      string                             `json:"name" yaml:"name"`
-	Namespace string                             `json:"namespace" yaml:"namespace"`
-	Spec      networkingv1.NetworkPolicySpec     `json:"spec" yaml:"spec"`
+	Name      string                         `json:"name" yaml:"name"`
+	Namespace string                         `json:"namespace" yaml:"namespace"`
+	Spec      networkingv1.NetworkPolicySpec `json:"spec" yaml:"spec"`
 }
 
 type RBACInfo struct {

@@ -9,26 +9,26 @@ import (
 
 type Config struct {
 	// Collection settings
-	IncludeSecrets      bool     `mapstructure:"include_secrets"`
-	ExcludeNamespaces   []string `mapstructure:"exclude_namespaces"`
-	SecurityFocus       bool     `mapstructure:"security_focus"`
-	DetailedAnalysis    bool     `mapstructure:"detailed_analysis"`
-	
+	IncludeSecrets    bool     `mapstructure:"include_secrets"`
+	ExcludeNamespaces []string `mapstructure:"exclude_namespaces"`
+	SecurityFocus     bool     `mapstructure:"security_focus"`
+	DetailedAnalysis  bool     `mapstructure:"detailed_analysis"`
+
 	// Output settings
-	RedactSensitive     bool     `mapstructure:"redact_sensitive"`
-	CompressionEnabled  bool     `mapstructure:"compression_enabled"`
-	
+	RedactSensitive    bool `mapstructure:"redact_sensitive"`
+	CompressionEnabled bool `mapstructure:"compression_enabled"`
+
 	// Collection modules
 	Modules struct {
-		Pods            bool `mapstructure:"pods"`
-		Services        bool `mapstructure:"services"`
-		NetworkPolicies bool `mapstructure:"network_policies"`
-		RBAC            bool `mapstructure:"rbac"`
-		Secrets         bool `mapstructure:"secrets"`
-		ConfigMaps      bool `mapstructure:"configmaps"`
-		Nodes           bool `mapstructure:"nodes"`
-		Namespaces      bool `mapstructure:"namespaces"`
-		Events          bool `mapstructure:"events"`
+		Pods                 bool `mapstructure:"pods"`
+		Services             bool `mapstructure:"services"`
+		NetworkPolicies      bool `mapstructure:"network_policies"`
+		RBAC                 bool `mapstructure:"rbac"`
+		Secrets              bool `mapstructure:"secrets"`
+		ConfigMaps           bool `mapstructure:"configmaps"`
+		Nodes                bool `mapstructure:"nodes"`
+		Namespaces           bool `mapstructure:"namespaces"`
+		Events               bool `mapstructure:"events"`
 		PodSecurityStandards bool `mapstructure:"pod_security_standards"`
 	} `mapstructure:"modules"`
 }
@@ -70,11 +70,11 @@ func setDefaults() {
 	viper.SetDefault("exclude_namespaces", []string{"kube-system", "kube-public", "kube-node-lease"})
 	viper.SetDefault("security_focus", true)
 	viper.SetDefault("detailed_analysis", false)
-	
-	// Output settings  
+
+	// Output settings
 	viper.SetDefault("redact_sensitive", true)
 	viper.SetDefault("compression_enabled", false)
-	
+
 	// Collection modules - enable all by default
 	viper.SetDefault("modules.pods", true)
 	viper.SetDefault("modules.services", true)
@@ -86,7 +86,7 @@ func setDefaults() {
 	viper.SetDefault("modules.namespaces", true)
 	viper.SetDefault("modules.events", true)
 	viper.SetDefault("modules.pod_security_standards", true)
-	
+
 	// Override with environment if in cluster
 	if os.Getenv("KUBERNETES_SERVICE_HOST") != "" {
 		viper.SetDefault("security_focus", true)

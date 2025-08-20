@@ -27,6 +27,11 @@ lint:
 	@echo "Running linter..."
 	@golangci-lint run
 
+# Format Go code
+fmt:
+	@echo "Formatting Go code..."
+	@gofmt -s -w .
+
 # Build Docker image
 docker-build:
 	@echo "Building Docker image..."

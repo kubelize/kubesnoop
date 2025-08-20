@@ -80,7 +80,7 @@ func run(cmd *cobra.Command, args []string) {
 
 	// Load configuration
 	cfg := config.LoadConfig()
-	
+
 	// Create collector
 	col := collector.New(clientset, cfg)
 
@@ -122,7 +122,7 @@ func createKubernetesClient() (*kubernetes.Clientset, error) {
 
 func runOnce(col *collector.Collector, evaluator *rules.Evaluator) {
 	logrus.Info("Starting single collection run")
-	
+
 	ctx := context.Background()
 	result, err := col.CollectAll(ctx, namespace)
 	if err != nil {
@@ -151,7 +151,7 @@ func runOnce(col *collector.Collector, evaluator *rules.Evaluator) {
 
 func runDaemon(col *collector.Collector, evaluator *rules.Evaluator) {
 	logrus.Infof("Starting daemon mode with interval: %v", interval)
-	
+
 	ticker := time.NewTicker(interval)
 	defer ticker.Stop()
 

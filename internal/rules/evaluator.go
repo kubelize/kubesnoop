@@ -259,7 +259,7 @@ func (e *Evaluator) evaluateCondition(value gjson.Result, condition, description
 		if len(parts) != 2 {
 			return true, ""
 		}
-		
+
 		expected := strings.TrimSpace(parts[1])
 		actual := value.String()
 
@@ -293,7 +293,7 @@ func (e *Evaluator) evaluateCondition(value gjson.Result, condition, description
 		if !value.Exists() {
 			return false, description
 		}
-		
+
 		// Check the other condition
 		if strings.Contains(condition, "== 0") && value.Int() == 0 {
 			return false, description
