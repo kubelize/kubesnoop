@@ -1,4 +1,5 @@
 # KubeSnoop
+[![Go Report Card](https://goreportcard.com/badge/github.com/kubelize/kubesnoop)](https://goreportcard.com/report/github.com/kubelize/kubesnoop)
 
 A Kubernetes cluster security information collection and evaluation tool.
 
